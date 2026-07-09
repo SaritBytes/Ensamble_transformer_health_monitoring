@@ -14,6 +14,8 @@ Target   : Health_index -> 3 class labels
 import pandas as pd
 import numpy as np
 import warnings
+import os
+import joblib
 warnings.filterwarnings('ignore')
 
 from sklearn.model_selection import train_test_split
@@ -226,3 +228,15 @@ for name, acc in sorted(all_results.items(), key=lambda x: -x[1]):
 print("\n" + "=" * 58)
 print("  All Models & Ensembles Training/Evaluation Complete!")
 print("=" * 58)
+
+# ─────────────────────────────────────────────
+# 9. SAVE MODELS
+# ─────────────────────────────────────────────
+print("\n" + "=" * 58)
+print("  SAVING MODELS TO DISK")
+print("=" * 58)
+os.makedirs('models', exist_ok=True)
+joblib.dump(scaler, 'models/scaler.pkl')
+joblib.dump(le, 'models/label_encoder.pkl')
+joblib.dump(stack_clf, 'models/stack_clf.pkl')
+print("  [SUCCESS] Saved scaler, label encoder, and stack_clf to 'models/' directory.")
