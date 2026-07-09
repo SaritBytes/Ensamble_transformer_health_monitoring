@@ -5,3 +5,6 @@ xgboost
 lightgbm
 imbalanced-learn
 joblib
+fastapi
+uvicorn
+requests
