@@ -1,4 +1,6 @@
 {
-  "reportMissingModuleSource": false,
-  "reportMissingImports": false
+  "pythonVersion": "3.12",
+  "pythonPlatform": "Windows",
+  "pythonPath": "C:/Users/abwor/AppData/Local/Programs/Python/Python312/python.exe",
+  "typeCheckingMode": "basic"
 }
