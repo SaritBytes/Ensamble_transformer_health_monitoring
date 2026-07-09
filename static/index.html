@@ -3,82 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transformer Health Dashboard</title>
+    <title>Transformer Health Monitor | Real-Time Dashboard</title>
+    <meta name="description" content="Real-time power transformer health monitoring dashboard using ensemble machine learning and FIFO memory architecture.">
     
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     
-    <!-- Styles -->
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <div class="background-mesh"></div>
+    <div class="bg-mesh"></div>
     
     <div class="container">
-        <header class="glass-panel">
-            <div class="header-content">
-                <h1>⚡ Transformer Health <span>Monitor</span></h1>
-                <div class="status-indicator">
-                    <div class="pulse-ring"></div>
-                    <span id="global-status">Waiting for data...</span>
+        <!-- HEADER -->
+        <header class="glass-card header-bar">
+            <div class="header-left">
+                <div class="logo-icon">⚡</div>
+                <div>
+                    <h1>Transformer Health <span class="accent">Monitor</span></h1>
+                    <p class="subtitle">Real-Time Ensemble ML Dashboard</p>
                 </div>
+            </div>
+            <div class="header-right">
+                <div class="live-dot" id="live-dot"></div>
+                <span class="live-label" id="live-label">Connecting...</span>
             </div>
         </header>
 
-        <div id="alert-banner" class="alert-banner hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-            <span id="alert-text">Sustained critical failure detected!</span>
+        <!-- ALERT BANNER -->
+        <div class="alert-banner hidden" id="alert-banner">
+            <div class="alert-icon">⚠</div>
+            <span id="alert-text"></span>
         </div>
 
-        <div class="dashboard-grid">
-            
-            <div class="main-chart glass-panel">
-                <h2>Health Confidence Trend</h2>
-                <div class="chart-container">
+        <!-- TOP STATS ROW -->
+        <div class="stats-row">
+            <div class="stat-card glass-card">
+                <div class="stat-label">Buffer Usage</div>
+                <div class="stat-value" id="stat-buffer">0 / 1440</div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-label">Avg Confidence</div>
+                <div class="stat-value" id="stat-avg-conf">--</div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-label">Current Health</div>
+                <div class="stat-value stat-health" id="stat-health">--</div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-label">Last Updated</div>
+                <div class="stat-value stat-time" id="stat-time">--</div>
+            </div>
+        </div>
+
+        <!-- MAIN GRID -->
+        <div class="main-grid">
+            <!-- CHART -->
+            <div class="glass-card chart-panel">
+                <h2 class="panel-title">Health Confidence Timeline</h2>
+                <div class="chart-wrap">
                     <canvas id="trendChart"></canvas>
                 </div>
             </div>
-            
-            <div class="side-panel glass-panel">
-                <h2>Latest Prediction</h2>
+
+            <!-- PREDICTION PANEL -->
+            <div class="glass-card prediction-panel">
+                <h2 class="panel-title">Latest Prediction</h2>
                 
-                <div class="prediction-box">
-                    <h3 id="current-health">--</h3>
-                    <p class="confidence">Confidence: <span id="current-conf">--</span>%</p>
+                <div class="health-badge" id="health-badge">
+                    <div class="badge-label" id="badge-label">--</div>
+                    <div class="badge-conf" id="badge-conf">--% confidence</div>
                 </div>
-                
-                <div class="probabilities">
-                    <h4>Probabilities</h4>
-                    <div class="prob-row">
-                        <span>Healthy</span>
-                        <div class="bar-bg"><div class="bar-fill healthy-fill" id="prob-healthy"></div></div>
-                        <span class="prob-val" id="val-healthy">--</span>
-                    </div>
-                    <div class="prob-row">
-                        <span>About to be Unhealthy</span>
-                        <div class="bar-bg"><div class="bar-fill warning-fill" id="prob-warning"></div></div>
-                        <span class="prob-val" id="val-warning">--</span>
-                    </div>
-                    <div class="prob-row">
-                        <span>Unhealthy</span>
-                        <div class="bar-bg"><div class="bar-fill danger-fill" id="prob-danger"></div></div>
-                        <span class="prob-val" id="val-danger">--</span>
-                    </div>
+
+                <div class="prob-section">
+                    <h3 class="prob-title">Class Probabilities</h3>
+                    <div id="prob-bars"></div>
                 </div>
             </div>
-            
         </div>
-        
-        <div class="sensor-grid">
-            <h2 class="section-title">Live Sensor Telemetry</h2>
-            <div class="kpi-cards" id="kpi-container">
-                <!-- KPI cards injected by JS -->
-            </div>
+
+        <!-- SENSOR TELEMETRY -->
+        <div class="glass-card telemetry-panel">
+            <h2 class="panel-title">Live Sensor Telemetry</h2>
+            <div class="kpi-grid" id="kpi-grid"></div>
         </div>
     </div>
 
