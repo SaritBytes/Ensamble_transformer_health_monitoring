@@ -1,33 +1,45 @@
-const FEATURE_COLS = [
-    'Hydrogen', 'Oxigen', 'Nitrogen', 'Methane', 'CO', 'CO2',
-    'Ethylene', 'Ethane', 'Acethylene', 'DBDS',
-    'Power_factor', 'Interfacial_V', 'Dielectric_rigidity', 'Water_content'
-];
+// ── Color mapping for health classes ──
+const CLASS_COLORS = {
+    'VG': '#10b981',   // green
+    'G':  '#22d3ee',   // cyan
+    'M':  '#f59e0b',   // amber
+    'B':  '#f97316',   // orange
+    'VB': '#ef4444',   // red
+};
+
+const CLASS_NAMES = {
+    'VG': 'Very Good',
+    'G':  'Good',
+    'M':  'Moderate',
+    'B':  'Bad',
+    'VB': 'Very Bad',
+};
 
 let trendChart = null;
+let knownFeatures = [];
 
-// Initialize Chart.js
+// ── Chart.js Setup ──
 function initChart() {
     const ctx = document.getElementById('trendChart').getContext('2d');
-    
     Chart.defaults.color = '#94a3b8';
     Chart.defaults.font.family = "'Outfit', sans-serif";
-    
+
     trendChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: [],
             datasets: [{
-                label: 'Health Confidence (%)',
+                label: 'Confidence (%)',
                 data: [],
                 borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                borderWidth: 2,
-                pointBackgroundColor: '#10b981',
-                pointRadius: 4,
-                pointHoverRadius: 6,
+                backgroundColor: 'rgba(59,130,246,0.08)',
+                borderWidth: 2.5,
+                pointBackgroundColor: [],
+                pointBorderColor: [],
+                pointRadius: 5,
+                pointHoverRadius: 7,
                 fill: true,
-                tension: 0.4
+                tension: 0.35,
             }]
         },
         options: {
@@ -37,155 +49,193 @@ function initChart() {
                 y: {
                     beginAtZero: true,
                     max: 100,
-                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                    grid: { color: 'rgba(255,255,255,0.04)' },
+                    ticks: { callback: v => v + '%' },
                 },
                 x: {
                     grid: { display: false },
-                    ticks: {
-                        maxTicksLimit: 10
-                    }
+                    ticks: { maxTicksLimit: 12 },
                 }
             },
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    backgroundColor: 'rgba(11,17,32,0.95)',
                     titleColor: '#fff',
                     bodyColor: '#94a3b8',
                     borderColor: 'rgba(255,255,255,0.1)',
-                    borderWidth: 1
+                    borderWidth: 1,
+                    callbacks: {
+                        label: ctx => `${ctx.parsed.y.toFixed(1)}% confidence`
+                    }
                 }
             }
         }
     });
 }
 
-// Generate KPI Cards structure
-function initKPICards() {
-    const container = document.getElementById('kpi-container');
-    FEATURE_COLS.forEach(col => {
+// ── Build KPI Cards ──
+function initKPIs(features) {
+    const grid = document.getElementById('kpi-grid');
+    grid.innerHTML = '';
+    features.forEach(name => {
         const card = document.createElement('div');
         card.className = 'kpi-card';
         card.innerHTML = `
-            <div class="kpi-label">${col.replace('_', ' ')}</div>
-            <div class="kpi-value" id="kpi-${col}">--</div>
+            <div class="kpi-name">${name}</div>
+            <div class="kpi-val" id="kpi-${name}">--</div>
         `;
-        container.appendChild(card);
+        grid.appendChild(card);
     });
 }
 
-// Update UI elements with latest data
+// ── Build Probability Bars ──
+function initProbBars(classes) {
+    const container = document.getElementById('prob-bars');
+    container.innerHTML = '';
+    classes.forEach(cls => {
+        const color = CLASS_COLORS[cls] || '#94a3b8';
+        const row = document.createElement('div');
+        row.className = 'prob-row';
+        row.innerHTML = `
+            <span class="prob-label">${CLASS_NAMES[cls] || cls}</span>
+            <div class="prob-track">
+                <div class="prob-fill" id="prob-fill-${cls}" style="background:${color}"></div>
+            </div>
+            <span class="prob-val" id="prob-val-${cls}">--</span>
+        `;
+        container.appendChild(row);
+    });
+}
+
+// ── Update Everything ──
 function updateUI(history) {
-    if (history.length === 0) return;
-    
-    // Update Chart
-    const labels = history.map(item => new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}));
-    const dataPoints = history.map(item => {
-        // We want to graph "Health Confidence" - so if it's unhealthy, maybe it's lower.
-        // Actually, confidence is just max probability. 
-        // Let's graph the probability of being 'Healthy' to show a clear trend line.
-        return item.probabilities['Healthy'] * 100;
-    });
-    
-    trendChart.data.labels = labels.slice(-20); // show last 20 points
-    trendChart.data.datasets[0].data = dataPoints.slice(-20);
-    trendChart.data.datasets[0].label = 'Healthy Probability (%)';
-    trendChart.update();
-    
-    // Update Latest Status
+    if (!history.length) return;
+
     const latest = history[history.length - 1];
-    
-    const statusText = document.getElementById('current-health');
-    statusText.innerText = latest.status;
-    
-    const confText = document.getElementById('current-conf');
-    confText.innerText = latest.confidence.toFixed(1);
-    
-    const indicator = document.querySelector('.status-indicator');
-    const globalStatus = document.getElementById('global-status');
-    globalStatus.innerText = "System Active";
-    
-    if (latest.status === 'Healthy') {
-        statusText.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
-        indicator.style.color = 'var(--status-healthy)';
-    } else if (latest.status === 'About to be Unhealthy') {
-        statusText.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
-        indicator.style.color = 'var(--status-warning)';
-    } else {
-        statusText.style.background = 'linear-gradient(90deg, #ef4444, #f87171)';
-        indicator.style.color = 'var(--status-danger)';
+    const last20 = history.slice(-20);
+
+    // Chart
+    trendChart.data.labels = last20.map(r =>
+        new Date(r.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})
+    );
+    trendChart.data.datasets[0].data = last20.map(r => r.confidence);
+    trendChart.data.datasets[0].pointBackgroundColor = last20.map(r => CLASS_COLORS[r.status] || '#94a3b8');
+    trendChart.data.datasets[0].pointBorderColor     = last20.map(r => CLASS_COLORS[r.status] || '#94a3b8');
+    trendChart.update('none');
+
+    // Health badge
+    const badge  = document.getElementById('health-badge');
+    const label  = document.getElementById('badge-label');
+    const conf   = document.getElementById('badge-conf');
+    const color  = CLASS_COLORS[latest.status] || '#94a3b8';
+
+    label.textContent = latest.readable_status || latest.status;
+    label.style.color = color;
+    conf.textContent  = `${latest.confidence}% confidence`;
+
+    // Stats row
+    document.getElementById('stat-health').textContent = latest.readable_status || latest.status;
+    document.getElementById('stat-health').style.color = color;
+    document.getElementById('stat-time').textContent =
+        new Date(latest.timestamp).toLocaleTimeString();
+
+    // Live indicator
+    const dot = document.getElementById('live-dot');
+    const lbl = document.getElementById('live-label');
+    dot.classList.add('active');
+    lbl.textContent = 'System Active';
+    lbl.style.color = 'var(--green)';
+
+    // Probability bars
+    if (latest.probabilities) {
+        for (const [cls, pct] of Object.entries(latest.probabilities)) {
+            const fill = document.getElementById(`prob-fill-${cls}`);
+            const val  = document.getElementById(`prob-val-${cls}`);
+            if (fill) fill.style.width = `${pct}%`;
+            if (val)  val.textContent  = `${pct.toFixed(1)}%`;
+        }
     }
-    statusText.style.webkitBackgroundClip = 'text';
-    
-    // Update Probabilities
-    ['Healthy', 'About to be Unhealthy', 'Unhealthy'].forEach(cls => {
-        let id_suffix = cls === 'Healthy' ? 'healthy' : (cls === 'Unhealthy' ? 'danger' : 'warning');
-        let prob = (latest.probabilities[cls] * 100).toFixed(1);
-        
-        document.getElementById(`val-${id_suffix}`).innerText = `${prob}%`;
-        document.getElementById(`prob-${id_suffix}`).style.width = `${prob}%`;
-    });
-    
-    // Update KPI Cards
-    for (const [key, val] of Object.entries(latest.features)) {
-        const el = document.getElementById(`kpi-${key}`);
-        if (el) {
-            // Add slight animation class if value changed
-            const oldVal = el.innerText;
-            const newVal = val.toFixed(2);
-            if(oldVal !== newVal && oldVal !== '--') {
-                el.parentElement.style.transform = 'scale(1.05)';
-                setTimeout(() => el.parentElement.style.transform = 'translateY(0)', 200);
-            }
-            el.innerText = newVal;
+
+    // KPI cards
+    if (latest.features) {
+        for (const [key, val] of Object.entries(latest.features)) {
+            const el = document.getElementById(`kpi-${key}`);
+            if (el) el.textContent = typeof val === 'number' ? val.toFixed(3) : val;
         }
     }
 }
 
-// Fetch Alerts
+// ── Fetch Stats ──
+async function fetchStats() {
+    try {
+        const res = await fetch('/api/stats');
+        if (res.ok) {
+            const s = await res.json();
+            document.getElementById('stat-buffer').textContent = `${s.buffer_size} / ${s.buffer_capacity}`;
+            if (s.avg_confidence != null)
+                document.getElementById('stat-avg-conf').textContent = `${s.avg_confidence}%`;
+        }
+    } catch (e) {}
+}
+
+// ── Fetch Alerts ──
 async function fetchAlerts() {
     try {
         const res = await fetch('/api/alerts');
-        const alertState = await res.json();
-        
-        const banner = document.getElementById('alert-banner');
-        const alertText = document.getElementById('alert-text');
-        
-        if (alertState.active) {
-            banner.classList.remove('hidden');
-            alertText.innerText = alertState.message;
-        } else {
-            banner.classList.add('hidden');
+        if (res.ok) {
+            const a = await res.json();
+            const banner = document.getElementById('alert-banner');
+            if (a.active) {
+                banner.className = `alert-banner ${a.level}`;
+                document.getElementById('alert-text').textContent = a.message;
+            } else {
+                banner.className = 'alert-banner hidden';
+            }
         }
-    } catch (e) {
-        console.error("Alert fetch failed", e);
-    }
+    } catch (e) {}
 }
 
-// Polling Loop
-async function pollData() {
+// ── Main Poll Loop ──
+async function poll() {
     try {
         const res = await fetch('/api/history');
         if (res.ok) {
             const history = await res.json();
             updateUI(history);
+
+            // Initialize prob bars on first data if not done yet
+            if (history.length && !document.getElementById('prob-fill-G')) {
+                const classes = Object.keys(history[0].probabilities);
+                initProbBars(classes);
+            }
         }
-    } catch(e) {
-        console.error("Failed to fetch history:", e);
-        document.getElementById('global-status').innerText = "Connection Lost";
-        document.querySelector('.status-indicator').style.color = "var(--status-danger)";
+    } catch (e) {
+        document.getElementById('live-label').textContent = 'Connection Lost';
+        document.getElementById('live-dot').classList.remove('active');
     }
-    
+
+    await fetchStats();
     await fetchAlerts();
-    
-    setTimeout(pollData, 2000); // Poll every 2 seconds
+
+    setTimeout(poll, 2000);
 }
 
-// Initialization
-document.addEventListener('DOMContentLoaded', () => {
+// ── Init ──
+document.addEventListener('DOMContentLoaded', async () => {
     initChart();
-    initKPICards();
-    pollData();
+
+    // Fetch expected features from server
+    try {
+        const res = await fetch('/api/features');
+        if (res.ok) {
+            const data = await res.json();
+            knownFeatures = data.features || [];
+            initKPIs(knownFeatures);
+        }
+    } catch (e) {
+        initKPIs(['Water','Acidity','DBV','DF','TDCG','Furan']);
+    }
+
+    poll();
 });
