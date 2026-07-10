@@ -1,0 +1,10 @@
+# Ignore everything except the static directory and vercel config
+saved_model/
+__pycache__/
+*.py
+*.csv
+*.pdf
+*.joblib
+*.bak
+.vscode/
+.git/
