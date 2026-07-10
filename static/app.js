@@ -1,3 +1,9 @@
+// ════════════════════════════════════════════════════════════
+//  Transformer Health Monitor – Fully Client-Side Dashboard
+//  Loads pre-computed predictions from demo_data.json and
+//  simulates a live sensor feed in the browser.
+// ════════════════════════════════════════════════════════════
+
 // ── Color mapping for health classes ──
 const CLASS_COLORS = {
     'VG': '#10b981',   // green
@@ -15,10 +21,22 @@ const CLASS_NAMES = {
     'VB': 'Very Bad',
 };
 
+// ── State ──
 let trendChart = null;
-let knownFeatures = [];
+let demoRecords = [];
+let demoClasses = [];
+let demoFeatures = [];
+let recordIndex = 0;
 
-// ── Chart.js Setup ──
+const BUFFER_CAPACITY = 1440;
+const ALERT_THRESHOLD = 3;
+const FEED_INTERVAL_MS = 2000;
+const memoryBuffer = [];          // FIFO ring buffer (in-browser)
+let alertState = { active: false, message: '', level: 'ok' };
+
+// ══════════════════════════════════════════
+//  Chart.js Setup
+// ══════════════════════════════════════════
 function initChart() {
     const ctx = document.getElementById('trendChart').getContext('2d');
     Chart.defaults.color = '#94a3b8';
@@ -74,7 +92,9 @@ function initChart() {
     });
 }
 
-// ── Build KPI Cards ──
+// ══════════════════════════════════════════
+//  Build KPI Cards
+// ══════════════════════════════════════════
 function initKPIs(features) {
     const grid = document.getElementById('kpi-grid');
     grid.innerHTML = '';
@@ -89,7 +109,9 @@ function initKPIs(features) {
     });
 }
 
-// ── Build Probability Bars ──
+// ══════════════════════════════════════════
+//  Build Probability Bars
+// ══════════════════════════════════════════
 function initProbBars(classes) {
     const container = document.getElementById('prob-bars');
     container.innerHTML = '';
@@ -108,46 +130,91 @@ function initProbBars(classes) {
     });
 }
 
-// ── Update Everything ──
-function updateUI(history) {
-    if (!history.length) return;
+// ══════════════════════════════════════════
+//  Alert Engine (mirrors server.py logic)
+// ══════════════════════════════════════════
+function evaluateAlerts() {
+    if (memoryBuffer.length < ALERT_THRESHOLD) return;
 
-    const latest = history[history.length - 1];
-    const last20 = history.slice(-20);
+    const recent = memoryBuffer.slice(-ALERT_THRESHOLD).map(r => r.status);
 
-    // Chart
+    if (recent.every(s => s === 'B' || s === 'VB')) {
+        alertState = {
+            active: true,
+            message: `CRITICAL: Last ${ALERT_THRESHOLD} readings show Bad/Very Bad health!`,
+            level: 'danger'
+        };
+    } else if (recent.every(s => s === 'M')) {
+        alertState = {
+            active: true,
+            message: `WARNING: Sustained Moderate health over ${ALERT_THRESHOLD} readings.`,
+            level: 'warning'
+        };
+    } else {
+        alertState = { active: false, message: '', level: 'ok' };
+    }
+
+    // Render
+    const banner = document.getElementById('alert-banner');
+    if (alertState.active) {
+        banner.className = `alert-banner ${alertState.level}`;
+        document.getElementById('alert-text').textContent = alertState.message;
+    } else {
+        banner.className = 'alert-banner hidden';
+    }
+}
+
+// ══════════════════════════════════════════
+//  Update Stats Row
+// ══════════════════════════════════════════
+function updateStats() {
+    document.getElementById('stat-buffer').textContent =
+        `${memoryBuffer.length} / ${BUFFER_CAPACITY}`;
+
+    if (memoryBuffer.length > 0) {
+        const avgConf = memoryBuffer.reduce((s, r) => s + r.confidence, 0) / memoryBuffer.length;
+        document.getElementById('stat-avg-conf').textContent = `${avgConf.toFixed(2)}%`;
+    }
+}
+
+// ══════════════════════════════════════════
+//  Update All UI Panels
+// ══════════════════════════════════════════
+function updateUI() {
+    if (!memoryBuffer.length) return;
+
+    const latest = memoryBuffer[memoryBuffer.length - 1];
+    const last20 = memoryBuffer.slice(-20);
+
+    // ── Chart ──
     trendChart.data.labels = last20.map(r =>
-        new Date(r.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})
+        new Date(r.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     );
     trendChart.data.datasets[0].data = last20.map(r => r.confidence);
     trendChart.data.datasets[0].pointBackgroundColor = last20.map(r => CLASS_COLORS[r.status] || '#94a3b8');
     trendChart.data.datasets[0].pointBorderColor     = last20.map(r => CLASS_COLORS[r.status] || '#94a3b8');
     trendChart.update('none');
 
-    // Health badge
-    const badge  = document.getElementById('health-badge');
-    const label  = document.getElementById('badge-label');
-    const conf   = document.getElementById('badge-conf');
-    const color  = CLASS_COLORS[latest.status] || '#94a3b8';
+    // ── Health Badge ──
+    const label = document.getElementById('badge-label');
+    const conf  = document.getElementById('badge-conf');
+    const color = CLASS_COLORS[latest.status] || '#94a3b8';
 
     label.textContent = latest.readable_status || latest.status;
     label.style.color = color;
     conf.textContent  = `${latest.confidence}% confidence`;
 
-    // Stats row
+    // ── Stats Row ──
     document.getElementById('stat-health').textContent = latest.readable_status || latest.status;
     document.getElementById('stat-health').style.color = color;
-    document.getElementById('stat-time').textContent =
-        new Date(latest.timestamp).toLocaleTimeString();
+    document.getElementById('stat-time').textContent   = new Date(latest.timestamp).toLocaleTimeString();
 
-    // Live indicator
-    const dot = document.getElementById('live-dot');
-    const lbl = document.getElementById('live-label');
-    dot.classList.add('active');
-    lbl.textContent = 'System Active';
-    lbl.style.color = 'var(--green)';
+    // ── Live Indicator ──
+    document.getElementById('live-dot').classList.add('active');
+    document.getElementById('live-label').textContent = 'Simulation Active';
+    document.getElementById('live-label').style.color = 'var(--green)';
 
-    // Probability bars
+    // ── Probability Bars ──
     if (latest.probabilities) {
         for (const [cls, pct] of Object.entries(latest.probabilities)) {
             const fill = document.getElementById(`prob-fill-${cls}`);
@@ -157,7 +224,7 @@ function updateUI(history) {
         }
     }
 
-    // KPI cards
+    // ── KPI Cards ──
     if (latest.features) {
         for (const [key, val] of Object.entries(latest.features)) {
             const el = document.getElementById(`kpi-${key}`);
@@ -166,76 +233,69 @@ function updateUI(history) {
     }
 }
 
-// ── Fetch Stats ──
-async function fetchStats() {
-    try {
-        const res = await fetch('/api/stats');
-        if (res.ok) {
-            const s = await res.json();
-            document.getElementById('stat-buffer').textContent = `${s.buffer_size} / ${s.buffer_capacity}`;
-            if (s.avg_confidence != null)
-                document.getElementById('stat-avg-conf').textContent = `${s.avg_confidence}%`;
-        }
-    } catch (e) {}
-}
+// ══════════════════════════════════════════
+//  Simulation Feed – ingest one record
+// ══════════════════════════════════════════
+function ingestNext() {
+    if (!demoRecords.length) return;
 
-// ── Fetch Alerts ──
-async function fetchAlerts() {
-    try {
-        const res = await fetch('/api/alerts');
-        if (res.ok) {
-            const a = await res.json();
-            const banner = document.getElementById('alert-banner');
-            if (a.active) {
-                banner.className = `alert-banner ${a.level}`;
-                document.getElementById('alert-text').textContent = a.message;
-            } else {
-                banner.className = 'alert-banner hidden';
-            }
-        }
-    } catch (e) {}
-}
+    const baseRecord = demoRecords[recordIndex % demoRecords.length];
+    recordIndex++;
 
-// ── Main Poll Loop ──
-async function poll() {
-    try {
-        const res = await fetch('/api/history');
-        if (res.ok) {
-            const history = await res.json();
-            updateUI(history);
-
-            // Initialize prob bars on first data if not done yet
-            if (history.length && !document.getElementById('prob-fill-G')) {
-                const classes = Object.keys(history[0].probabilities);
-                initProbBars(classes);
-            }
-        }
-    } catch (e) {
-        document.getElementById('live-label').textContent = 'Connection Lost';
-        document.getElementById('live-dot').classList.remove('active');
+    // Add a small random jitter to features so each cycle feels fresh
+    const jitteredFeatures = {};
+    for (const [key, val] of Object.entries(baseRecord.features)) {
+        const jitter = val * (0.97 + Math.random() * 0.06);   // ±3%
+        jitteredFeatures[key] = parseFloat(jitter.toFixed(4));
     }
 
-    await fetchStats();
-    await fetchAlerts();
+    const record = {
+        timestamp: new Date().toISOString(),
+        features: jitteredFeatures,
+        status: baseRecord.status,
+        readable_status: baseRecord.readable_status,
+        confidence: baseRecord.confidence,
+        probabilities: baseRecord.probabilities,
+    };
 
-    setTimeout(poll, 2000);
+    // FIFO
+    memoryBuffer.push(record);
+    if (memoryBuffer.length > BUFFER_CAPACITY) memoryBuffer.shift();
+
+    updateUI();
+    updateStats();
+    evaluateAlerts();
 }
 
-// ── Init ──
+// ══════════════════════════════════════════
+//  Initialization
+// ══════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
     initChart();
 
-    // Fetch expected features from server
+    // Load pre-computed demo data
     try {
-        const res = await fetch('/api/features');
-        if (res.ok) {
-            const data = await res.json();
-            knownFeatures = data.features || [];
-            initKPIs(knownFeatures);
-        }
-    } catch (e) {
-        initKPIs(['Water','Acidity','DBV','DF','TDCG','Furan']);
-    }
+        const res = await fetch('./demo_data.json');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    poll();
+        const data = await res.json();
+        demoRecords  = data.records  || [];
+        demoClasses  = data.classes  || [];
+        demoFeatures = data.features || [];
+
+        initKPIs(demoFeatures);
+        initProbBars(demoClasses);
+
+        // Start simulation loop
+        setInterval(ingestNext, FEED_INTERVAL_MS);
+        // Immediately ingest the first record
+        ingestNext();
+
+    } catch (err) {
+        console.error('Failed to load demo data:', err);
+        document.getElementById('live-label').textContent = 'Data Load Failed';
+        document.getElementById('live-label').style.color = 'var(--red)';
+        // Fallback KPIs
+        initKPIs(['Water', 'Acidity', 'DBV', 'DF', 'TDCG', 'Furan']);
+    }
 });
