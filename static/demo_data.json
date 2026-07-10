@@ -1,0 +1,619 @@
+{
+  "features": [
+    "Water",
+    "Acidity",
+    "DBV",
+    "DF",
+    "TDCG",
+    "Furan"
+  ],
+  "classes": [
+    "B",
+    "G",
+    "M",
+    "VB",
+    "VG"
+  ],
+  "records": [
+    {
+      "features": {
+        "Water": 21.7,
+        "Acidity": 0.024,
+        "DBV": 32.5,
+        "DF": 0.075,
+        "TDCG": 483.0,
+        "Furan": 0.86
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 75.15,
+      "probabilities": {
+        "B": 6.73,
+        "G": 75.15,
+        "M": 5.39,
+        "VB": 4.68,
+        "VG": 8.06
+      }
+    },
+    {
+      "features": {
+        "Water": 26.9,
+        "Acidity": 0.098,
+        "DBV": 40.5,
+        "DF": 0.894,
+        "TDCG": 254.0,
+        "Furan": 0.65
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 84.06,
+      "probabilities": {
+        "B": 4.68,
+        "G": 84.06,
+        "M": 5.2,
+        "VB": 3.25,
+        "VG": 2.8
+      }
+    },
+    {
+      "features": {
+        "Water": 14.5,
+        "Acidity": 0.033,
+        "DBV": 58.0,
+        "DF": 0.14,
+        "TDCG": 78.0,
+        "Furan": 0.26
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 83.49,
+      "probabilities": {
+        "B": 4.42,
+        "G": 83.49,
+        "M": 3.93,
+        "VB": 3.44,
+        "VG": 4.72
+      }
+    },
+    {
+      "features": {
+        "Water": 21.2,
+        "Acidity": 0.226,
+        "DBV": 48.7,
+        "DF": 0.424,
+        "TDCG": 215.0,
+        "Furan": 5.53
+      },
+      "status": "M",
+      "readable_status": "Moderate",
+      "confidence": 41.01,
+      "probabilities": {
+        "B": 25.59,
+        "G": 21.77,
+        "M": 41.01,
+        "VB": 7.17,
+        "VG": 4.46
+      }
+    },
+    {
+      "features": {
+        "Water": 10.0,
+        "Acidity": 0.01,
+        "DBV": 75.0,
+        "DF": 0.111,
+        "TDCG": 126.0,
+        "Furan": 0.06
+      },
+      "status": "VG",
+      "readable_status": "Very Good",
+      "confidence": 81.9,
+      "probabilities": {
+        "B": 2.45,
+        "G": 10.99,
+        "M": 2.22,
+        "VB": 2.43,
+        "VG": 81.9
+      }
+    },
+    {
+      "features": {
+        "Water": 15.5,
+        "Acidity": 0.075,
+        "DBV": 71.0,
+        "DF": 0.143,
+        "TDCG": 38.0,
+        "Furan": 0.53
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 87.72,
+      "probabilities": {
+        "B": 3.67,
+        "G": 87.72,
+        "M": 3.18,
+        "VB": 2.83,
+        "VG": 2.6
+      }
+    },
+    {
+      "features": {
+        "Water": 16.8,
+        "Acidity": 0.167,
+        "DBV": 70.1,
+        "DF": 0.255,
+        "TDCG": 149.0,
+        "Furan": 0.78
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 83.29,
+      "probabilities": {
+        "B": 5.51,
+        "G": 83.29,
+        "M": 4.73,
+        "VB": 3.51,
+        "VG": 2.97
+      }
+    },
+    {
+      "features": {
+        "Water": 15.0,
+        "Acidity": 0.092,
+        "DBV": 67.8,
+        "DF": 0.211,
+        "TDCG": 28.0,
+        "Furan": 0.69
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 87.96,
+      "probabilities": {
+        "B": 3.79,
+        "G": 87.96,
+        "M": 3.12,
+        "VB": 2.76,
+        "VG": 2.37
+      }
+    },
+    {
+      "features": {
+        "Water": 17.0,
+        "Acidity": 0.035,
+        "DBV": 62.7,
+        "DF": 0.113,
+        "TDCG": 9.0,
+        "Furan": 0.21
+      },
+      "status": "VG",
+      "readable_status": "Very Good",
+      "confidence": 75.66,
+      "probabilities": {
+        "B": 3.13,
+        "G": 15.35,
+        "M": 2.81,
+        "VB": 3.05,
+        "VG": 75.66
+      }
+    },
+    {
+      "features": {
+        "Water": 30.0,
+        "Acidity": 0.088,
+        "DBV": 37.6,
+        "DF": 0.353,
+        "TDCG": 197.0,
+        "Furan": 0.31
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 86.73,
+      "probabilities": {
+        "B": 4.2,
+        "G": 86.73,
+        "M": 3.65,
+        "VB": 2.86,
+        "VG": 2.56
+      }
+    },
+    {
+      "features": {
+        "Water": 16.2,
+        "Acidity": 0.181,
+        "DBV": 25.5,
+        "DF": 0.201,
+        "TDCG": 35.0,
+        "Furan": 8.76
+      },
+      "status": "VB",
+      "readable_status": "Very Bad",
+      "confidence": 89.25,
+      "probabilities": {
+        "B": 2.24,
+        "G": 4.12,
+        "M": 2.46,
+        "VB": 89.25,
+        "VG": 1.92
+      }
+    },
+    {
+      "features": {
+        "Water": 15.0,
+        "Acidity": 0.155,
+        "DBV": 37.5,
+        "DF": 0.182,
+        "TDCG": 53.0,
+        "Furan": 7.29
+      },
+      "status": "VB",
+      "readable_status": "Very Bad",
+      "confidence": 86.32,
+      "probabilities": {
+        "B": 3.33,
+        "G": 5.13,
+        "M": 2.93,
+        "VB": 86.32,
+        "VG": 2.3
+      }
+    },
+    {
+      "features": {
+        "Water": 16.8,
+        "Acidity": 0.115,
+        "DBV": 25.6,
+        "DF": 0.174,
+        "TDCG": 78.0,
+        "Furan": 9.6
+      },
+      "status": "VB",
+      "readable_status": "Very Bad",
+      "confidence": 85.99,
+      "probabilities": {
+        "B": 3.36,
+        "G": 5.27,
+        "M": 3.04,
+        "VB": 85.99,
+        "VG": 2.34
+      }
+    },
+    {
+      "features": {
+        "Water": 15.0,
+        "Acidity": 0.21,
+        "DBV": 57.0,
+        "DF": 0.22,
+        "TDCG": 53.0,
+        "Furan": 6.69
+      },
+      "status": "B",
+      "readable_status": "Bad",
+      "confidence": 85.22,
+      "probabilities": {
+        "B": 85.22,
+        "G": 4.74,
+        "M": 2.53,
+        "VB": 5.44,
+        "VG": 2.06
+      }
+    },
+    {
+      "features": {
+        "Water": 27.6,
+        "Acidity": 0.089,
+        "DBV": 30.4,
+        "DF": 0.128,
+        "TDCG": 336.0,
+        "Furan": 5.12
+      },
+      "status": "B",
+      "readable_status": "Bad",
+      "confidence": 86.92,
+      "probabilities": {
+        "B": 86.92,
+        "G": 4.67,
+        "M": 2.28,
+        "VB": 4.24,
+        "VG": 1.89
+      }
+    },
+    {
+      "features": {
+        "Water": 23.5,
+        "Acidity": 0.106,
+        "DBV": 45.8,
+        "DF": 0.207,
+        "TDCG": 30.0,
+        "Furan": 0.24
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 80.17,
+      "probabilities": {
+        "B": 6.12,
+        "G": 80.17,
+        "M": 5.24,
+        "VB": 4.28,
+        "VG": 4.18
+      }
+    },
+    {
+      "features": {
+        "Water": 24.8,
+        "Acidity": 0.012,
+        "DBV": 29.9,
+        "DF": 0.068,
+        "TDCG": 504.0,
+        "Furan": 1.68
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 47.69,
+      "probabilities": {
+        "B": 12.61,
+        "G": 47.69,
+        "M": 8.38,
+        "VB": 8.0,
+        "VG": 23.32
+      }
+    },
+    {
+      "features": {
+        "Water": 23.6,
+        "Acidity": 0.07,
+        "DBV": 39.2,
+        "DF": 0.203,
+        "TDCG": 22.0,
+        "Furan": 0.5
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 86.34,
+      "probabilities": {
+        "B": 4.09,
+        "G": 86.34,
+        "M": 3.6,
+        "VB": 3.23,
+        "VG": 2.75
+      }
+    },
+    {
+      "features": {
+        "Water": 30.5,
+        "Acidity": 0.073,
+        "DBV": 28.7,
+        "DF": 67.0,
+        "TDCG": 30.0,
+        "Furan": 1.7
+      },
+      "status": "M",
+      "readable_status": "Moderate",
+      "confidence": 48.51,
+      "probabilities": {
+        "B": 4.77,
+        "G": 38.61,
+        "M": 48.51,
+        "VB": 4.45,
+        "VG": 3.65
+      }
+    },
+    {
+      "features": {
+        "Water": 18.4,
+        "Acidity": 0.063,
+        "DBV": 64.5,
+        "DF": 0.243,
+        "TDCG": 69.0,
+        "Furan": 0.15
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 85.71,
+      "probabilities": {
+        "B": 4.02,
+        "G": 85.71,
+        "M": 3.65,
+        "VB": 3.09,
+        "VG": 3.53
+      }
+    },
+    {
+      "features": {
+        "Water": 21.1,
+        "Acidity": 0.019,
+        "DBV": 28.4,
+        "DF": 0.025,
+        "TDCG": 144.0,
+        "Furan": 0.02
+      },
+      "status": "VG",
+      "readable_status": "Very Good",
+      "confidence": 78.82,
+      "probabilities": {
+        "B": 2.82,
+        "G": 13.14,
+        "M": 2.48,
+        "VB": 2.74,
+        "VG": 78.82
+      }
+    },
+    {
+      "features": {
+        "Water": 8.1,
+        "Acidity": 0.01,
+        "DBV": 66.9,
+        "DF": 0.042,
+        "TDCG": 71.0,
+        "Furan": 0.05
+      },
+      "status": "VG",
+      "readable_status": "Very Good",
+      "confidence": 81.21,
+      "probabilities": {
+        "B": 2.51,
+        "G": 11.55,
+        "M": 2.26,
+        "VB": 2.48,
+        "VG": 81.21
+      }
+    },
+    {
+      "features": {
+        "Water": 19.6,
+        "Acidity": 0.216,
+        "DBV": 41.1,
+        "DF": 0.264,
+        "TDCG": 48.0,
+        "Furan": 7.54
+      },
+      "status": "VB",
+      "readable_status": "Very Bad",
+      "confidence": 85.31,
+      "probabilities": {
+        "B": 3.34,
+        "G": 5.47,
+        "M": 3.46,
+        "VB": 85.31,
+        "VG": 2.42
+      }
+    },
+    {
+      "features": {
+        "Water": 6.0,
+        "Acidity": 0.01,
+        "DBV": 67.6,
+        "DF": 0.126,
+        "TDCG": 427.0,
+        "Furan": 0.08
+      },
+      "status": "VG",
+      "readable_status": "Very Good",
+      "confidence": 61.24,
+      "probabilities": {
+        "B": 4.71,
+        "G": 26.48,
+        "M": 3.61,
+        "VB": 3.96,
+        "VG": 61.24
+      }
+    },
+    {
+      "features": {
+        "Water": 18.4,
+        "Acidity": 0.152,
+        "DBV": 37.2,
+        "DF": 0.299,
+        "TDCG": 81.0,
+        "Furan": 1.14
+      },
+      "status": "M",
+      "readable_status": "Moderate",
+      "confidence": 68.46,
+      "probabilities": {
+        "B": 4.28,
+        "G": 20.4,
+        "M": 68.46,
+        "VB": 4.04,
+        "VG": 2.82
+      }
+    },
+    {
+      "features": {
+        "Water": 11.1,
+        "Acidity": 0.032,
+        "DBV": 67.2,
+        "DF": 0.089,
+        "TDCG": 119.0,
+        "Furan": 0.04
+      },
+      "status": "VG",
+      "readable_status": "Very Good",
+      "confidence": 82.02,
+      "probabilities": {
+        "B": 2.43,
+        "G": 10.94,
+        "M": 2.19,
+        "VB": 2.41,
+        "VG": 82.02
+      }
+    },
+    {
+      "features": {
+        "Water": 21.5,
+        "Acidity": 0.147,
+        "DBV": 60.8,
+        "DF": 0.938,
+        "TDCG": 168.0,
+        "Furan": 0.92
+      },
+      "status": "M",
+      "readable_status": "Moderate",
+      "confidence": 76.93,
+      "probabilities": {
+        "B": 2.84,
+        "G": 15.21,
+        "M": 76.93,
+        "VB": 2.77,
+        "VG": 2.26
+      }
+    },
+    {
+      "features": {
+        "Water": 7.5,
+        "Acidity": 0.16,
+        "DBV": 70.1,
+        "DF": 0.448,
+        "TDCG": 10.0,
+        "Furan": 0.06
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 80.54,
+      "probabilities": {
+        "B": 4.74,
+        "G": 80.54,
+        "M": 6.58,
+        "VB": 3.84,
+        "VG": 4.3
+      }
+    },
+    {
+      "features": {
+        "Water": 13.0,
+        "Acidity": 0.091,
+        "DBV": 51.6,
+        "DF": 0.369,
+        "TDCG": 8.0,
+        "Furan": 0.32
+      },
+      "status": "G",
+      "readable_status": "Good",
+      "confidence": 86.66,
+      "probabilities": {
+        "B": 3.85,
+        "G": 86.66,
+        "M": 3.85,
+        "VB": 2.89,
+        "VG": 2.75
+      }
+    },
+    {
+      "features": {
+        "Water": 35.7,
+        "Acidity": 0.229,
+        "DBV": 41.4,
+        "DF": 0.639,
+        "TDCG": 24.0,
+        "Furan": 1.07
+      },
+      "status": "M",
+      "readable_status": "Moderate",
+      "confidence": 80.58,
+      "probabilities": {
+        "B": 2.3,
+        "G": 12.99,
+        "M": 80.58,
+        "VB": 2.27,
+        "VG": 1.86
+      }
+    }
+  ]
+}
